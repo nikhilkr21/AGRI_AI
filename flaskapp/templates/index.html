@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crop Recommendation System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h2>Crop Recommendation System</h2>
+    <form method="POST" class="form-container">
+      <!-- First Row: N, P, K -->
+      <div class="row">
+        <div class="col">
+          <label for="N">Nitrogen (N):</label>
+          <input type="number" name="N" value="{{ request.form['N'] if 'N' in request.form else '' }}" required>
+        </div>
+        <div class="col">
+          <label for="P">Phosphorus (P):</label>
+          <input type="number" name="P" value="{{ request.form['P'] if 'P' in request.form else '' }}" required>
+        </div>
+        <div class="col">
+          <label for="K">Potassium (K):</label>
+          <input type="number" name="K" value="{{ request.form['K'] if 'K' in request.form else '' }}" required>
+        </div>
+      </div>
+      <!-- Second Row: Temperature, Humidity, pH -->
+      <div class="row">
+        <div class="col">
+          <label for="temperature">Temperature (°C):</label>
+          <input type="number" step="0.1" name="temperature" value="{{ request.form['temperature'] if 'temperature' in request.form else '' }}" required>
+        </div>
+        <div class="col">
+          <label for="humidity">Humidity (%):</label>
+          <input type="number" step="0.1" name="humidity" value="{{ request.form['humidity'] if 'humidity' in request.form else '' }}" required>
+        </div>
+        <div class="col">
+          <label for="ph">pH Level:</label>
+          <input type="number" step="0.1" name="ph" value="{{ request.form['ph'] if 'ph' in request.form else '' }}" required>
+        </div>
+      </div>
+      <!-- Third Row: Rainfall (placed in the first column; other columns left empty for layout symmetry) -->
+      <div class="row">
+        <div class="col">
+          <label for="rainfall">Rainfall (mm):</label>
+          <input type="number" step="0.1" name="rainfall" value="{{ request.form['rainfall'] if 'rainfall' in request.form else '' }}" required>
+        </div>
+        <div class="col"></div>
+        <div class="col"></div>
+      </div>
+      <button type="submit">Predict Crop</button>
+    </form>
+
+    {% if prediction %}
+    <div class="result-container">
+      <h3>Recommended Crop</h3>
+      <p class="result">{{ prediction }}</p>
+    </div>
+    {% endif %}
+  </div>
+</body>
+</html>
