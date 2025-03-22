@@ -1,61 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Crop Recommendation System</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Agriculture Advisor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
   <div class="container">
-    <h2>Crop Recommendation System</h2>
-    <form method="POST" class="form-container">
-      <!-- First Row: N, P, K -->
-      <div class="row">
-        <div class="col">
-          <label for="N">Nitrogen (N):</label>
-          <input type="number" name="N" value="{{ request.form['N'] if 'N' in request.form else '' }}" required>
+    <!-- Card Selection Screen -->
+    <div id="cardSelection" class="card-selection" {% if form_type or prediction %}style="display:none;"{% endif %}>
+      <h1>Smart Agriculture Advisor</h1>
+      <p>Select a service to get started</p>
+      <div class="cards">
+        <div class="card" onclick="openForm('crop')">
+          <h2>Crop Recommendation</h2>
+          <p>Get the best crop suggestions based on your field data</p>
         </div>
-        <div class="col">
-          <label for="P">Phosphorus (P):</label>
-          <input type="number" name="P" value="{{ request.form['P'] if 'P' in request.form else '' }}" required>
+        <div class="card" onclick="openForm('fertilizer')">
+          <h2>Fertilizer Recommendation</h2>
+          <p>Know which fertilizer is ideal for your crop</p>
         </div>
-        <div class="col">
-          <label for="K">Potassium (K):</label>
-          <input type="number" name="K" value="{{ request.form['K'] if 'K' in request.form else '' }}" required>
-        </div>
-      </div>
-      <!-- Second Row: Temperature, Humidity, pH -->
-      <div class="row">
-        <div class="col">
-          <label for="temperature">Temperature (°C):</label>
-          <input type="number" step="0.1" name="temperature" value="{{ request.form['temperature'] if 'temperature' in request.form else '' }}" required>
-        </div>
-        <div class="col">
-          <label for="humidity">Humidity (%):</label>
-          <input type="number" step="0.1" name="humidity" value="{{ request.form['humidity'] if 'humidity' in request.form else '' }}" required>
-        </div>
-        <div class="col">
-          <label for="ph">pH Level:</label>
-          <input type="number" step="0.1" name="ph" value="{{ request.form['ph'] if 'ph' in request.form else '' }}" required>
+        <div class="card" onclick="openChat()">
+          <h2>Chat with Advisor</h2>
+          <p>Ask questions and get instant help</p>
         </div>
       </div>
-      <!-- Third Row: Rainfall -->
-      <div class="row">
-        <div class="col">
-          <label for="rainfall">Rainfall (mm):</label>
-          <input type="number" step="0.1" name="rainfall" value="{{ request.form['rainfall'] if 'rainfall' in request.form else '' }}" required>
-        </div>
-      </div>
-      <button type="submit">Predict Crop</button>
-    </form>
-
-    {% if prediction %}
-    <div class="result-container">
-      <h3>Recommended Crop</h3>
-      <p class="result">{{ prediction }}</p>
     </div>
-    {% endif %}
+    <!-- Overlay Form Container -->
+    <div id="formOverlay" class="form-overlay" {% if form_type=="crop" or form_type=="fertilizer" or prediction %}style="display:block;"{% else %}style="display:none;"{% endif %}>
+      <div class="form-header">
+        <button class="btn-back" onclick="backToCards()">← Back</button>
+        <h2 id="formTitle">
+          {% if form_type %}
+            {{ "Crop Recommendation" if form_type=="crop" else "Fertilizer Recommendation" }}
+          {% else %}
+            Chat with Advisor
+          {% endif %}
+        </h2>
+      </div>
+      <!-- Crop Recommendation Form -->
+      <div id="cropForm" class="form-content" {% if form_type != "crop" %}style="display:none;"{% endif %}>
+        <form method="POST" action="/">
+          <input type="hidden" name="form_type" value="crop">
+          <div class="form-group">
+            <label for="N">Nitrogen (N)</label>
+            <input type="number" name="N" step="any" required>
+          </div>
+          <div class="form-group">
+            <label for="P">Phosphorus (P)</label>
+            <input type="number" name="P" step="any" required>
+          </div>
+          <div class="form-group">
+            <label for="K">Potassium (K)</label>
+            <input type="number" name="K" step="any" required>
+          </div>
+          <div class="form-group">
+            <label for="temperature">Temperature (°C)</label>
+            <input type="number" name="temperature" step="any" required>
+          </div>
+          <div class="form-group">
+            <label for="humidity">Humidity (%)</label>
+            <input type="number" name="humidity" step="any" required>
+          </div>
+          <div class="form-group">
+            <label for="ph">pH Level</label>
+            <input type="number" name="ph" step="any" required>
+          </div>
+          <div class="form-group">
+            <label for="rainfall">Rainfall (mm)</label>
+            <input type="number" name="rainfall" step="any" required>
+          </div>
+          <button type="submit" class="btn-submit">Predict Crop</button>
+        </form>
+        {% if prediction and form_type=="crop" %}
+        <div class="result-card">
+          <h3>Recommendation</h3>
+          <p>{{ prediction }}</p>
+        </div>
+        {% endif %}
+      </div>
+      <!-- Fertilizer Recommendation Form -->
+      <div id="fertilizerForm" class="form-content" {% if form_type != "fertilizer" %}style="display:none;"{% endif %}>
+        <form method="POST" action="/">
+          <input type="hidden" name="form_type" value="fertilizer">
+          <div class="form-group">
+            <label for="temperature_fert">Temperature (°C)</label>
+            <input type="number" name="temperature_fert" step="any" required>
+          </div>
+          <div class="form-group">
+            <label for="humidity_fert">Humidity (%)</label>
+            <input type="number" name="humidity_fert" step="any" required>
+          </div>
+          <div class="form-group">
+            <label for="moisture">Moisture (%)</label>
+            <input type="number" name="moisture" step="any" required>
+          </div>
+          <div class="form-group">
+            <label for="soil_type">Soil Type</label>
+            <input type="text" name="soil_type" required>
+          </div>
+          <div class="form-group">
+            <label for="crop_type">Crop Type</label>
+            <input type="text" name="crop_type" required>
+          </div>
+          <div class="form-group">
+            <label for="nitrogen">Nitrogen (N)</label>
+            <input type="number" name="nitrogen" step="any" required>
+          </div>
+          <div class="form-group">
+            <label for="potassium">Potassium (K)</label>
+            <input type="number" name="potassium" step="any" required>
+          </div>
+          <div class="form-group">
+            <label for="phosphorous">Phosphorous (P)</label>
+            <input type="number" name="phosphorous" step="any" required>
+          </div>
+          <button type="submit" class="btn-submit">Predict Fertilizer</button>
+        </form>
+        {% if prediction and form_type=="fertilizer" %}
+        <div class="result-card">
+          <h3>Recommendation</h3>
+          <p>{{ prediction }}</p>
+        </div>
+        {% endif %}
+      </div>
+      <!-- Chatbot Form -->
+      <div id="chatForm" class="form-content" {% if form_type != "chat" %}style="display:none;"{% endif %}>
+        <div class="chat-window" id="chatWindow">
+          <!-- Chat messages will be appended here -->
+        </div>
+        <div class="chat-input">
+          <input type="text" id="chatMessage" placeholder="Type your message..." />
+          <button onclick="sendChat()">Send</button>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <script>
+    // Function to show selected form overlay (crop, fertilizer, or chat)
+    function openForm(type) {
+      document.getElementById("cardSelection").style.display = "none";
+      document.getElementById("formOverlay").style.display = "block";
+      if(type === "crop") {
+        document.getElementById("formTitle").innerText = "Crop Recommendation";
+        document.getElementById("cropForm").style.display = "block";
+        document.getElementById("fertilizerForm").style.display = "none";
+        document.getElementById("chatForm").style.display = "none";
+      } else if(type === "fertilizer") {
+        document.getElementById("formTitle").innerText = "Fertilizer Recommendation";
+        document.getElementById("cropForm").style.display = "none";
+        document.getElementById("fertilizerForm").style.display = "block";
+        document.getElementById("chatForm").style.display = "none";
+      }
+    }
+    // Function to open the chat interface
+    function openChat() {
+      document.getElementById("cardSelection").style.display = "none";
+      document.getElementById("formOverlay").style.display = "block";
+      document.getElementById("formTitle").innerText = "Chat with Advisor";
+      document.getElementById("cropForm").style.display = "none";
+      document.getElementById("fertilizerForm").style.display = "none";
+      document.getElementById("chatForm").style.display = "block";
+    }
+    // Function to return to card selection view
+    function backToCards() {
+      document.getElementById("formOverlay").style.display = "none";
+      document.getElementById("cardSelection").style.display = "block";
+    }
+    
+    // Chat functionality using the Hugging Face API
+    function sendChat() {
+      const chatMessageInput = document.getElementById("chatMessage");
+      const message = chatMessageInput.value.trim();
+      if(message === "") return;
+      appendMessage("You", message);
+      chatMessageInput.value = "";
+      // Send message to Flask /chat endpoint
+      fetch("/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: message })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.reply) {
+          appendMessage("Advisor", data.reply);
+        } else {
+          appendMessage("Advisor", "Sorry, I couldn't process your request.");
+        }
+      })
+      .catch(err => {
+        appendMessage("Advisor", "Error: " + err);
+      });
+    }
+    
+    // Append message to chat window
+    function appendMessage(sender, message) {
+      const chatWindow = document.getElementById("chatWindow");
+      const messageDiv = document.createElement("div");
+      messageDiv.classList.add("chat-message");
+      messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+      chatWindow.appendChild(messageDiv);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+    
+    // Preserve input data using localStorage (for crop and fertilizer forms)
+    document.addEventListener('DOMContentLoaded', function() {
+      const cropInputs = document.querySelectorAll('#cropForm input');
+      cropInputs.forEach(input => {
+        const key = 'crop_' + input.name;
+        if(localStorage.getItem(key)) {
+          input.value = localStorage.getItem(key);
+        }
+        input.addEventListener('input', () => {
+          localStorage.setItem(key, input.value);
+        });
+      });
+      const fertInputs = document.querySelectorAll('#fertilizerForm input');
+      fertInputs.forEach(input => {
+        const key = 'fert_' + input.name;
+        if(localStorage.getItem(key)) {
+          input.value = localStorage.getItem(key);
+        }
+        input.addEventListener('input', () => {
+          localStorage.setItem(key, input.value);
+        });
+      });
+    });
+  </script>
 </body>
 </html>
