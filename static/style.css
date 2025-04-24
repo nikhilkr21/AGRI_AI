@@ -1,0 +1,392 @@
+/* Define CSS variables for easy theming */
+:root {
+  --primary-color: #5563de;
+  --secondary-color: #4452b8;
+  --accent-color: #ff4d4d;
+  --bg-gradient-start: #f4f7fc;
+  --bg-gradient-end: #e9eff5;
+  --card-shadow: rgba(0, 0, 0, 0.15);
+  --transition-speed: 0.4s;
+}
+
+/* Global Reset & Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  animation: bgGradient 10s ease infinite;
+  color: #333;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+body {
+  background: url('{{ url_for("static", filename="images/c.jpg") }}') no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Roboto', sans-serif;
+  color: #333;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Animated Background Gradient */
+@keyframes bgGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 1rem;
+}
+
+/* Card Selection Screen */
+.card-selection {
+  text-align: center;
+  padding: 2rem;
+  animation: fadeIn 1s ease-out;
+}
+
+.card-selection h1 {
+  font-size: 2.8rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.card-selection p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: #555;
+}
+
+/* Cards */
+.cards {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+/* Card Container */
+.card {
+  background: #fff;
+  padding: 16px; /* Padding around all card content */
+  border-radius: 16px;
+  width: 320px;
+  box-shadow: 0 8px 20px var(--card-shadow);
+  cursor: pointer;
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+  perspective: 1000px;
+  text-align: left;
+}
+
+/* Image inside the card fills the available content area */
+.card img {
+  width: 100%;
+  height: 200px; /* Fixed height for consistent presentation */
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.card:hover {
+  transform: rotateY(8deg) translateY(-12px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+}
+
+.card h2 {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+}
+
+.card p {
+  font-size: 1rem;
+  color: #777;
+}
+
+/* Form Overlay */
+.form-overlay {
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+  margin-top: 2rem;
+  animation: slideIn 0.8s ease-out;
+}
+
+.form-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.btn-back {
+  background: #e8e8e8;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  margin-right: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.btn-back:hover {
+  background: #d0d0d0;
+  transform: scale(1.05);
+}
+
+.form-overlay h2 {
+  font-size: 2.2rem;
+  color: var(--primary-color);
+}
+
+/* Form Content */
+.form-content {
+  margin-top: 1rem;
+  animation: fadeIn 0.6s ease;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 8px rgba(85, 99, 222, 0.3);
+  outline: none;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 0.8rem;
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.btn-submit:hover {
+  background: var(--secondary-color);
+  transform: translateY(-2px);
+}
+
+/* Result Card */
+.result-card {
+  margin-top: 1.5rem;
+  background: var(--primary-color);
+  color: #fff;
+  padding: 1.5rem;
+  border-radius: 16px;
+  text-align: center;
+  animation: popIn 0.6s ease;
+}
+
+.result-card h3 {
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+}
+
+.result-card p {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+/* Upload Area for Disease Detection */
+.upload-area {
+  border: 2px dashed #ccc;
+  border-radius: 16px;
+  text-align: center;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  position: relative;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.upload-area.dragover {
+  background: #e8f0fe;
+  border-color: var(--primary-color);
+}
+
+.upload-icon {
+  max-width: 100px;
+  margin-bottom: 1rem;
+}
+
+.btn-upload {
+  display: inline-block;
+  background: var(--primary-color);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.btn-upload:hover {
+  background: var(--secondary-color);
+  transform: scale(1.05);
+}
+
+.preview-image {
+  max-width: 100%;
+  border-radius: 16px;
+  margin-bottom: 0.5rem;
+}
+
+.btn-remove {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: var(--accent-color);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.btn-remove:hover {
+  background: darkred;
+  transform: scale(1.1);
+}
+
+/* Chat Section */
+.chat-settings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.chat-settings label {
+  font-weight: 500;
+}
+
+.chat-settings select {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.3s;
+}
+
+.chat-window {
+  height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  padding: 1rem;
+  background: #fafafa;
+  margin-bottom: 1rem;
+  animation: fadeIn 0.5s ease;
+}
+
+.chat-message {
+  margin-bottom: 0.75rem;
+}
+
+.chat-input {
+  display: flex;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 8px 0 0 8px;
+  font-size: 1rem;
+  transition: border 0.3s;
+}
+
+.chat-input button {
+  padding: 0.8rem 1.2rem;
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.chat-input button:hover {
+  background: var(--secondary-color);
+  transform: translateY(-2px);
+}
+
+/* Audio Element for Chat */
+audio {
+  width: 100%;
+  margin-top: 1rem;
+  outline: none;
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(100px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .cards {
+    flex-direction: column;
+    align-items: center;
+  }
+  .card {
+    width: 90%;
+  }
+  .container {
+    padding: 1rem;
+  }
+  .chat-window {
+    height: 250px;
+  }
+}

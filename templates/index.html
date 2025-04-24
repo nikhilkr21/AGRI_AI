@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart Agriculture Advisor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+  <!-- Hero Section with Banner Image 
+  <header style="position: relative;">
+    <img src="{{ url_for('static', filename='images/banner.png') }}" alt="banner" style="width: 10%; border-radius: 8px;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; text-shadow: 2px 2px 6px rgba(0,0,0,0.6);">
+      <h1 style="font-size: 3rem;">Smart Agriculture Advisor</h1>
+      <p style="font-size: 1.5rem;">Innovative solutions for modern farming</p>
+    </div>
+  </header> -->
+  <div class="container">
+    <!-- Card Selection Screen -->
+    <div id="cardSelection" class="card-selection" {% if form_type or prediction %}style="display:none;"{% endif %}>
+      <h1>Smart Agriculture Advisor</h1>
+      <p>Select a service to get started</p>
+      <div class="cards">
+        <div class="card" onclick="openForm('crop')">
+          <img src="{{ url_for('static', filename='images/crop.png') }}" alt="Crop" style="width: 100%; border-radius: 8px; margin-bottom: 1rem;">
+          <h2>Crop Recommendation</h2>
+          <p>Get the best crop suggestions based on your field data</p>
+        </div>
+        <div class="card" onclick="openForm('fertilizer')">
+          <img src="{{ url_for('static', filename='images/fert.jpg') }}" alt="fert" style="width: 100%; border-radius: 8px; margin-bottom: 1rem;">
+          <h2>Fertilizer Recommendation</h2>
+          <p>Know which fertilizer is ideal for your crop</p>
+        </div>
+        <div class="card" onclick="openForm('disease')">
+          <img src="{{ url_for('static', filename='images/dis.jpg') }}" alt="dis" style="width: 100%; border-radius: 8px; margin-bottom: 1rem;">
+          <h2>Disease Detection</h2>
+          <p>Upload a plant leaf image for disease diagnosis</p>
+        </div>
+        <div class="card" onclick="openForm('weather')">
+          <img src="{{ url_for('static', filename='images/weat.jpg') }}" alt="weat" style="width: 100%; border-radius: 8px; margin-bottom: 1rem;">
+          <h2>Weather Info</h2>
+          <p>Get current weather information for your area</p>
+        </div>
+        <div class="card" onclick="openForm('chat')">
+          <img src="{{ url_for('static', filename='images/chat.jpg') }}" alt="chat" style="width: 100%; border-radius: 8px; margin-bottom: 1rem;">
+          <h2>Agri Chat Advisor</h2>
+          <p>Ask questions and get instant help</p>
+        </div>
+        <div class="card" onclick="openForm('irrigation')">
+          <img src="{{ url_for('static', filename='images/iot.jpg') }}" alt="iot" style="width: 100%; border-radius: 8px; margin-bottom: 1rem;">
+          <h2>IoT Soil & Irrigation Alert</h2>
+          <p>Feature not available – coming soon with IoT integration</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay Form Container -->
+    <div id="formOverlay" class="form-overlay" {% if form_type %}style="display:block;"{% else %}style="display:none;"{% endif %}>
+      <div class="form-header">
+        <button class="btn-back" onclick="backToCards()">← Back</button>
+        <h2 id="formTitle">
+          {% if form_type == 'crop' %}Crop Recommendation
+          {% elif form_type == 'fertilizer' %}Fertilizer Recommendation
+          {% elif form_type == 'disease' %}Disease Detection
+          {% elif form_type == 'weather' %}Weather Information
+          {% elif form_type == 'irrigation' %}IoT Soil & Irrigation Alert
+          {% else %}Agri Chat Advisor{% endif %}
+        </h2>
+      </div>
+
+      <!-- Crop Recommendation Form -->
+      <div id="cropForm" class="form-content" {% if form_type != 'crop' %}style="display:none;"{% endif %}>
+        <form method="POST" action="/">
+          <input type="hidden" name="form_type" value="crop">
+          <div class="form-group">
+            <label>Nitrogen (N)</label>
+            <input type="number" name="N" step="any" required>
+          </div>
+          <div class="form-group">
+            <label>Phosphorus (P)</label>
+            <input type="number" name="P" step="any" required>
+          </div>
+          <div class="form-group">
+            <label>Potassium (K)</label>
+            <input type="number" name="K" step="any" required>
+          </div>
+          <div class="form-group">
+            <label>Temperature (°C)</label>
+            <input type="number" name="temperature" step="any" required>
+          </div>
+          <div class="form-group">
+            <label>Humidity (%)</label>
+            <input type="number" name="humidity" step="any" required>
+          </div>
+          <div class="form-group">
+            <label>pH Level</label>
+            <input type="number" name="ph" step="any" required>
+          </div>
+          <div class="form-group">
+            <label>Rainfall (mm)</label>
+            <input type="number" name="rainfall" step="any" required>
+          </div>
+          <button type="submit" class="btn-submit">Predict Crop</button>
+        </form>
+        {% if prediction and form_type == 'crop' %}
+        <div class="result-card">
+          <h3>Recommended Crop</h3>
+          <p>{{ prediction }}</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Fertilizer Recommendation Form -->
+      <div id="fertilizerForm" class="form-content" {% if form_type != 'fertilizer' %}style="display:none;"{% endif %}>
+        <form method="POST" action="/">
+          <input type="hidden" name="form_type" value="fertilizer">
+          <div class="form-group">
+            <label>Temperature (°C)</label>
+            <input type="number" name="temperature_fert" step="any" required>
+          </div>
+          <div class="form-group">
+            <label>Humidity (%)</label>
+            <input type="number" name="humidity_fert" step="any" required>
+          </div>
+          <div class="form-group">
+            <label>Moisture (%)</label>
+            <input type="number" name="moisture" step="any" required>
+          </div>
+          <div class="form-group">
+            <label>Soil Type</label>
+            <input type="text" name="soil_type" required>
+          </div>
+          <div class="form-group">
+            <label>Crop Type</label>
+            <input type="text" name="crop_type" required>
+          </div>
+          <div class="form-group">
+            <label>Nitrogen (N)</label>
+            <input type="number" name="nitrogen" step="any" required>
+          </div>
+          <div class="form-group">
+            <label>Potassium (K)</label>
+            <input type="number" name="potassium" step="any" required>
+          </div>
+          <div class="form-group">
+            <label>Phosphorous (P)</label>
+            <input type="number" name="phosphorous" step="any" required>
+          </div>
+          <button type="submit" class="btn-submit">Predict Fertilizer</button>
+        </form>
+        {% if prediction and form_type == 'fertilizer' %}
+        <div class="result-card">
+          <h3>Recommended Fertilizer</h3>
+          <p>{{ prediction }}</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Disease Detection Form -->
+      <div id="diseaseForm" class="form-content" {% if form_type != 'disease' %}style="display:none;"{% endif %}>
+        <div class="upload-area" id="dropZone" ondrop="dropHandler(event)" ondragover="dragOverHandler(event)" ondragleave="dragLeaveHandler(event)">
+          <div id="uploadContent">
+            <img src="{{ url_for('static', filename='images/upload-icon.png') }}" class="upload-icon">
+            <p>Drag and drop a leaf image<br>or</p>
+            <label for="fileInput" class="btn-upload">Choose File</label>
+            <input type="file" id="fileInput" name="file" accept="image/*" hidden>
+          </div>
+          <div id="previewContainer" style="display:none;">
+            <img id="imagePreview" class="preview-image">
+            <button class="btn-remove" onclick="clearImage()">×</button>
+          </div>
+        </div>
+        <button class="btn-submit" onclick="predictDisease()">Analyze Image</button>
+        <div id="diseaseResult" class="result-card" style="display:none;">
+          <h3>Detection Result</h3>
+          <p id="diseasePrediction"></p>
+        </div>
+      </div>
+
+      <!-- Weather Information Form -->
+      <div id="weatherForm" class="form-content" {% if form_type != 'weather' %}style="display:none;"{% endif %}>
+        <form method="POST" action="/">
+          <input type="hidden" name="form_type" value="weather">
+          <div class="form-group">
+            <label>Enter City Name</label>
+            <input type="text" name="city" required>
+          </div>
+          <button type="submit" class="btn-submit">Get Weather</button>
+        </form>
+        {% if prediction and form_type == 'weather' %}
+        <div class="result-card">
+          <p>{{ prediction|safe }}</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- IoT Based Soil Parameter and Irrigation Alert (Disabled) -->
+      <div id="irrigationForm" class="form-content" {% if form_type != 'irrigation' %}style="display:none;"{% endif %}>
+        <div class="result-card" style="background: #999; color: #eee;">
+          <h3>IoT Soil & Irrigation Alert</h3>
+          <p>This feature is currently not available. It can be implemented using IoT-based soil sensors and automated irrigation alerts.</p>
+        </div>
+      </div>
+
+      <!-- Chat Form -->
+      <div id="chatForm" class="form-content" {% if form_type != 'chat' %}style="display:none;"{% endif %}>
+        <div class="chat-settings">
+          <label for="inputLanguage">Input Language:</label>
+          <select id="inputLanguage">
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="bn">Bengali</option>
+            <option value="or">Odia</option>
+            <option value="gu">Gujarati</option>
+            <option value="kn">Kannada</option>
+            <option value="ml">Malayalam</option>
+            <option value="mr">Marathi</option>
+            <option value="pa">Punjabi</option>
+            <option value="ta">Tamil</option>
+            <option value="te">Telugu</option>
+          </select>
+          <label for="outputLanguage">Output Language:</label>
+          <select id="outputLanguage">
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="bn">Bengali</option>
+            <option value="or">Odia</option>
+            <option value="gu">Gujarati</option>
+            <option value="kn">Kannada</option>
+            <option value="ml">Malayalam</option>
+            <option value="mr">Marathi</option>
+            <option value="pa">Punjabi</option>
+            <option value="ta">Tamil</option>
+            <option value="te">Telugu</option>
+          </select>
+          <label for="outputScript">Output Script:</label>
+          <select id="outputScript">
+            <option value="native">Native</option>
+            <option value="romanized">Romanized</option>
+          </select>
+        </div>
+        <div class="chat-window" id="chatWindow">
+          <!-- Chat messages will appear here -->
+        </div>
+        <div class="chat-input">
+          <input type="text" id="chatMessage" placeholder="Type your message...">
+          <button onclick="sendChat()">Send</button>
+        </div>
+        <audio id="chatAudio" controls style="display:none;"></audio>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global variable to hold the uploaded file for disease detection
+    let uploadedFile = null;
+
+    function openForm(type) {
+      document.getElementById("cardSelection").style.display = "none";
+      document.getElementById("formOverlay").style.display = "block";
+      
+      // Hide all form sections
+      document.getElementById("cropForm").style.display = "none";
+      document.getElementById("fertilizerForm").style.display = "none";
+      document.getElementById("diseaseForm").style.display = "none";
+      document.getElementById("weatherForm").style.display = "none";
+      document.getElementById("irrigationForm").style.display = "none";
+      document.getElementById("chatForm").style.display = "none";
+      
+      if(type === 'crop') {
+        document.getElementById("formTitle").innerText = "Crop Recommendation";
+        document.getElementById("cropForm").style.display = "block";
+      } else if(type === 'fertilizer') {
+        document.getElementById("formTitle").innerText = "Fertilizer Recommendation";
+        document.getElementById("fertilizerForm").style.display = "block";
+      } else if(type === 'disease') {
+        document.getElementById("formTitle").innerText = "Disease Detection";
+        document.getElementById("diseaseForm").style.display = "block";
+      } else if(type === 'weather') {
+        document.getElementById("formTitle").innerText = "Weather Information";
+        document.getElementById("weatherForm").style.display = "block";
+      } else if(type === 'irrigation') {
+        document.getElementById("formTitle").innerText = "IoT Soil & Irrigation Alert";
+        document.getElementById("irrigationForm").style.display = "block";
+      } else {
+        document.getElementById("formTitle").innerText = "Agri Chat Advisor";
+        document.getElementById("chatForm").style.display = "block";
+      }
+    }
+
+    function backToCards() {
+      document.getElementById("formOverlay").style.display = "none";
+      document.getElementById("cardSelection").style.display = "block";
+    }
+
+    // Image handling for Disease Detection
+    function dragOverHandler(e) {
+      e.preventDefault();
+      document.getElementById("dropZone").classList.add("dragover");
+    }
+
+    function dragLeaveHandler(e) {
+      e.preventDefault();
+      document.getElementById("dropZone").classList.remove("dragover");
+    }
+
+    function dropHandler(e) {
+      e.preventDefault();
+      document.getElementById("dropZone").classList.remove("dragover");
+      if(e.dataTransfer.files.length) {
+        handleImage(e.dataTransfer.files[0]);
+      }
+    }
+
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      if(this.files.length) {
+        handleImage(this.files[0]);
+      }
+    });
+
+    function handleImage(file) {
+      if(!file.type.match('image.*')) return;
+      uploadedFile = file;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById("uploadContent").style.display = "none";
+        document.getElementById("previewContainer").style.display = "block";
+        document.getElementById("imagePreview").src = e.target.result;
+      }
+      reader.readAsDataURL(file);
+    }
+
+    function clearImage() {
+      document.getElementById("fileInput").value = "";
+      document.getElementById("uploadContent").style.display = "block";
+      document.getElementById("previewContainer").style.display = "none";
+      document.getElementById("diseaseResult").style.display = "none";
+      uploadedFile = null;
+    }
+
+    function predictDisease() {
+      if(!uploadedFile) {
+        alert('Please select an image first!');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('file', uploadedFile);
+      fetch('/detect_disease', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.error) {
+          alert('Error: ' + data.error);
+        } else {
+          document.getElementById("diseaseResult").style.display = "block";
+          document.getElementById("diseasePrediction").textContent = data.result;
+        }
+      })
+      .catch(error => {
+        alert('Error: ' + error);
+      });
+    }
+
+    // Chat functionality using the single chat endpoint with language and script options
+    function sendChat() {
+      const chatMessageInput = document.getElementById("chatMessage");
+      const message = chatMessageInput.value.trim();
+      if(message === "") return;
+      appendMessage("You", message);
+      chatMessageInput.value = "";
+
+      // Retrieve selected language options
+      const inputLang = document.getElementById("inputLanguage").value;
+      const outputLang = document.getElementById("outputLanguage").value;
+      const outputScript = document.getElementById("outputScript").value;
+
+      fetch("/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ 
+          message: message, 
+          input_language: inputLang, 
+          output_language: outputLang, 
+          output_script: outputScript 
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.reply) {
+          appendMessage("Advisor", data.reply);
+          // If audio is returned, set it as the source of the audio element and display it.
+          if(data.audio) {
+            const audioEl = document.getElementById("chatAudio");
+            audioEl.src = "data:audio/mp3;base64," + data.audio;
+            audioEl.style.display = "block";
+          }
+        } else {
+          appendMessage("Advisor", "Sorry, I couldn't process your request.");
+        }
+      })
+      .catch(err => {
+        appendMessage("Advisor", "Error: " + err);
+      });
+    }
+
+    function appendMessage(sender, message) {
+      const chatWindow = document.getElementById("chatWindow");
+      const messageDiv = document.createElement("div");
+      messageDiv.classList.add("chat-message");
+      messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+      chatWindow.appendChild(messageDiv);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // Preserve input data using localStorage for crop and fertilizer forms
+    document.addEventListener('DOMContentLoaded', function() {
+      const cropInputs = document.querySelectorAll('#cropForm input');
+      cropInputs.forEach(input => {
+        const key = 'crop_' + input.name;
+        if(localStorage.getItem(key)) {
+          input.value = localStorage.getItem(key);
+        }
+        input.addEventListener('input', () => {
+          localStorage.setItem(key, input.value);
+        });
+      });
+      const fertInputs = document.querySelectorAll('#fertilizerForm input');
+      fertInputs.forEach(input => {
+        const key = 'fert_' + input.name;
+        if(localStorage.getItem(key)) {
+          input.value = localStorage.getItem(key);
+        }
+        input.addEventListener('input', () => {
+          localStorage.setItem(key, input.value);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
