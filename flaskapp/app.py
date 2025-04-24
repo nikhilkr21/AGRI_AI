@@ -33,5 +33,7 @@ def index():
     
     return render_template("index.html", prediction=crop_prediction)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+import os
+
+port = int(os.environ.get("PORT", 10000))  # default to 10000 for local dev
+app.run(host='0.0.0.0', port=port)
