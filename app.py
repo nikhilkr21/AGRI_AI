@@ -345,5 +345,11 @@ def chat_route():
         print("Error in chat endpoint:", str(e))
         return jsonify({"error": str(e)}), 500
 
-if __name__ == "__main__":
-    app.run(debug=True)
+#if __name__ == "__main__":
+#    app.run(debug=True)
+from waitress import serve
+import os
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 10000))
+    serve(app, host='0.0.0.0', port=port)
