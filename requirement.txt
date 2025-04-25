@@ -15,3 +15,4 @@ pyttsx3
 deep_translator
 gTTS
 indic-transliteration
+xgboost
